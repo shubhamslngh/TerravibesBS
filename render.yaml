@@ -1,30 +1,45 @@
+previews:
+  generation: automatic
+
 services:
   - type: web
     name: event-platform
-    env: python
+    runtime: python
+    repo: https://github.com/<your-username>/<your-repo>  # <-- Change this!
+    branch: main
+    region: frankfurt
     plan: free
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate
       python manage.py collectstatic --noinput
     startCommand: gunicorn event_platform.wsgi:application
+    numInstances: 1
+    autoDeploy: true
+    maxShutdownDelaySeconds: 60
+    healthCheckPath: /
+    domains:
+      - event-platform.onrender.com     # <-- You can add custom domains
     envVars:
       - key: DATABASE_URL
-        value: <your-supabase-connection-string>
+        value: postgresql://postgres:Shubham851$@db.bwpgisooznriaolaejmk.supabase.co:5432/postgres
       - key: SECRET_KEY
-        value: <your-secret-key>
+        value: django-insecure-$srxwzq98fjj(-v17i!i4ebugand((#5o=&9xe^m6n5b^sxpja
       - key: DEBUG
         value: "False"
-      # Add any other env vars your app needs
+      # Add any more environment variables you need here, or use envVarGroups below
 
-# (Optional) If you use Celery/other services, define them below:
-#  - type: worker
-#    name: celery-worker
-#    env: python
-#    buildCommand: pip install -r requirements.txt
-#    startCommand: celery -A event_platform worker --loglevel=info
-#    envVars:
-#      - fromService:
-#          type: web
-#          name: event-platform
-#          envVarKey: DATABASE_URL
+# If you have a worker (for background tasks like Celery), add it here as another service type
+
+envVarGroups:
+  - name: django-common
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: event_platform.settings
+      # Add any global/shared env vars here
+
+# Example of a Postgres DB provisioned by Render (not used, since you use Supabase)
+# databases:
+#   - name: mydb
+#     plan: free
+
