@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: event-platform
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn event_platform.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        value: <your-supabase-connection-string>
+      - key: SECRET_KEY
+        value: <your-secret-key>
+      - key: DEBUG
+        value: "False"
+      # Add any other env vars your app needs
+
+# (Optional) If you use Celery/other services, define them below:
+#  - type: worker
+#    name: celery-worker
+#    env: python
+#    buildCommand: pip install -r requirements.txt
+#    startCommand: celery -A event_platform worker --loglevel=info
+#    envVars:
+#      - fromService:
+#          type: web
+#          name: event-platform
+#          envVarKey: DATABASE_URL
