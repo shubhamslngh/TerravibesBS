@@ -22,7 +22,7 @@ services:
       - event-platform.onrender.com     # <-- You can add custom domains
     envVars:
       - key: DATABASE_URL
-        value: postgresql://postgres:Shubham851$@db.bwpgisooznriaolaejmk.supabase.co:5432/postgres
+        value: postgresql://postgres.bwpgisooznriaolaejmk:Shubham851$@aws-0-ap-south-1.pooler.supabase.com:5432/postgres
       - key: SECRET_KEY
         value: django-insecure-$srxwzq98fjj(-v17i!i4ebugand((#5o=&9xe^m6n5b^sxpja
       - key: DEBUG
