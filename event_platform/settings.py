@@ -37,13 +37,20 @@ SECRET_KEY = "django-insecure-$srxwzq98fjj(-v17i!i4ebugand((#5o=&9xe^m6n5b^sxpja
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1","onrender.com", "http://localhost:3000", "0.0.0.0","event-platform-ai9e.onrender.com"]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React running as localhost
-    "http://127.0.0.1:3000",
-    "event-platform-ai9e.onrender.com",  # React running as 127.0.0.1
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "0.0.0.0",
+    "localhost",
+    "onrender.com",
+    "event-platform-ai9e.onrender.com",
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://event-platform-ai9e.onrender.com",
+]
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "authorization",
