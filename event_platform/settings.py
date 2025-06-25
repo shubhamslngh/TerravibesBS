@@ -142,10 +142,11 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",
-        "USER": "postgres",
+        "USER": "postgres.bwpgisooznriaolaejmk",
         "PASSWORD": "Shubham851$",  # Your actual DB password (do not use the brackets)
-        "HOST": "db.bwpgisooznriaolaejmk.supabase.co",
-        "PORT": "5432",
+        "HOST": "aws-0-ap-south-1.pooler.supabase.com",
+        "PORT": "6543",
+        "pool_mode": "transaction",
     }
 }
 # Password validation
