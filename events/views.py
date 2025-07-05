@@ -16,6 +16,8 @@ from .serializers import (
     RegisterSerializer,
     LoginSerializer,
 )
+from events.models import Guide
+from events.serializers import GuideSerializer
 
 User = get_user_model()
 
@@ -33,6 +35,25 @@ class RegisterAPI(generics.CreateAPIView):
 
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+class GuideViewSet(viewsets.ModelViewSet):
+    """
+    list:    GET /api/guides/
+    retrieve: GET /api/guides/{pk}/
+    create:  POST /api/guides/           (admin only)
+    update:  PUT/PATCH /api/guides/{pk}/ (admin only)
+    delete:  DELETE /api/guides/{pk}/    (admin only)
+    """
+
+    queryset = Guide.objects.prefetch_related("packages")
+    serializer_class = GuideSerializer
+
+    def get_permissions(self):
+        # read‐only for everyone; write for admins
+        if self.request.method in permissions.SAFE_METHODS:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 
 class LoginAPI(APIView):

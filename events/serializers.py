@@ -1,9 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from .models import Vendor, Content, EventPackage, Inquiry, Booking
+from .models import Vendor, Content, EventPackage, Inquiry, Booking, Guide
 from rest_framework.authtoken.models import Token
 
+
 User = get_user_model()
+class GuideSerializer(serializers.ModelSerializer):
+    # Show a nested list of package IDs or titles:
+    packages = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=EventPackage.objects.all()
+    )
+
+    class Meta:
+        model = Guide
+        fields = ["id", "name", "bio", "photo", "expertise", "packages"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -75,6 +85,7 @@ class ContentSerializer(serializers.ModelSerializer):
 
 class EventPackageSerializer(serializers.ModelSerializer):
     images = ContentSerializer(many=True, read_only=True)
+    guides = GuideSerializer(many=True, read_only=True)
 
     class Meta:
         model = EventPackage
@@ -87,6 +98,7 @@ class EventPackageSerializer(serializers.ModelSerializer):
             "images",
             "is_active",
             "moods",
+            "guides",
         ]
 
 

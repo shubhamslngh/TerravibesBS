@@ -93,6 +93,23 @@ class EventPackage(models.Model):
         return self.title
 
 
+class Guide(models.Model):
+    name = models.CharField(max_length=255)
+    bio = models.TextField(blank=True)
+    photo = models.ImageField(upload_to="guides/", blank=True, null=True)
+    expertise = models.CharField(
+        max_length=100, help_text="e.g. Yoga, Mindfulness, Adventure Travel"
+    )
+    packages = models.ManyToManyField(
+        "EventPackage",
+        related_name="guides",
+        blank=True,
+        help_text="Which experiences this guide leads",
+    )
+    def __str__(self):
+        return self.name
+
+
 class Inquiry(models.Model):
     STATUS_CHOICES = [
         ("new", "New"),

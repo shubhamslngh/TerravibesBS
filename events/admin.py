@@ -9,6 +9,7 @@ from .models import (
     Mood,
     HealingIntent,
     HealingActivity,
+    Guide,
 )
 
 
@@ -19,6 +20,11 @@ admin.site.register(EventPackage)
 admin.site.register(Inquiry)
 admin.site.register(Booking)
 admin.site.register(Mood)
+@admin.register(Guide)
+class GuideAdmin(admin.ModelAdmin):
+    list_display    = ("name", "expertise")
+    search_fields   = ("name", "expertise", "bio")
+    filter_horizontal = ("packages",)
 @admin.register(HealingIntent)
 class HealingIntentAdmin(admin.ModelAdmin):
     list_display = ("name", "recommended_duration", "emoji")
