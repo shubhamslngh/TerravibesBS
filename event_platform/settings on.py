@@ -12,10 +12,21 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from corsheaders.defaults import default_headers, default_methods
 
 from pathlib import Path
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # <--- This is the missing line!
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),  # Optional: for extra static dirs
+]
+
+# For production: serve static files efficiently
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -26,12 +37,20 @@ SECRET_KEY = "django-insecure-$srxwzq98fjj(-v17i!i4ebugand((#5o=&9xe^m6n5b^sxpja
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "http://localhost:3000", "0.0.0.0", "192.168.29.153"]
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React running as localhost
-    "http://127.0.0.1:3000",  # React running as 127.0.0.1
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "0.0.0.0",
+    "localhost",
+    "onrender.com",
+    "event-platform-ai9e.onrender.com",
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://event-platform-ai9e.onrender.com",
+]
+
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "authorization",
@@ -86,6 +105,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "event_platform.urls"
@@ -112,22 +132,23 @@ WSGI_APPLICATION = "event_platform.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
 # DATABASES = {
 #     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "postgres",
-#         "USER": "postgres",
-#         "PASSWORD": "Shubham851$",  # Your actual DB password (do not use the brackets)
-#         "HOST": "db.bwpgisooznriaolaejmk.supabase.co",
-#         "PORT": "5432",
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.bwpgisooznriaolaejmk",
+        "PASSWORD": "Shubham851$",  # Your actual DB password (do not use the brackets)
+        "HOST": "aws-0-ap-south-1.pooler.supabase.com",
+        "PORT": "6543",
+        "pool_mode": "transaction",
+    }
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -158,13 +179,5 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
