@@ -76,10 +76,20 @@ class VendorViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser]
 
 
-class ContentViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Content.objects.order_by("-publish_date")
+class ContentViewSet(viewsets.ModelViewSet):
     serializer_class = ContentSerializer
-    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        queryset = Content.objects.all().order_by("-publish_date")
+        content_type = self.request.query_params.get("content_type")
+        slug = self.request.query_params.get("slug")
+
+        if content_type:
+            queryset = queryset.filter(content_type=content_type)
+        if slug:
+            queryset = queryset.filter(slug=slug)
+
+        return queryset
 
 
 class EventPackageViewSet(viewsets.ModelViewSet):

@@ -81,6 +81,7 @@ class ContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content
         fields = "__all__"
+        read_only_fields = ["slug"]  # 👈 prevents manual overwriting
 
 
 class EventPackageSerializer(serializers.ModelSerializer):

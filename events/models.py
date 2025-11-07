@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.db import models
+from django.utils.text import slugify
 
 
 class User(AbstractUser):
@@ -39,10 +40,22 @@ class Content(models.Model):
         ("gallery", "Gallery Image"),
     ]
     title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255,  blank=True, unique=True) 
     content_type = models.CharField(max_length=50, choices=CONTENT_TYPES)
     body = models.TextField(blank=True)
     media_file = models.FileField(upload_to="uploads/")
     publish_date = models.DateTimeField(default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            num = 1
+            while Content.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} ({self.content_type})"
