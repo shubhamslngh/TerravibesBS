@@ -30,7 +30,6 @@ from .serializers import EventPackageSerializer
 import json
 
 
-
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])  # You can restrict to IsAdminUser later
 def seed_package(request):
@@ -140,24 +139,72 @@ class VendorViewSet(viewsets.ModelViewSet):
 
 class ContentViewSet(viewsets.ModelViewSet):
     serializer_class = ContentSerializer
-
-    def get_permissions(self):
-        # ✅ Allow anyone to GET or POST (temporary for development)
-        if self.request.method in ["GET", "POST"]:
-            return [permissions.AllowAny()]
-        return [permissions.IsAdminUser()]
-
+    queryset = Content.objects.all().order_by("-publish_date")
+    
     def get_queryset(self):
-        queryset = Content.objects.all().order_by("-publish_date")
+        queryset = super().get_queryset()
         content_type = self.request.query_params.get("content_type")
-        slug = self.request.query_params.get("slug")
-
         if content_type:
             queryset = queryset.filter(content_type=content_type)
-        if slug:
-            queryset = queryset.filter(slug=slug)
-
         return queryset
+
+
+    def perform_create(self, serializer):
+        """
+        Automatically generate title, slug, and body using Gemini AI
+        when an image is uploaded. If title/body are provided, they will
+        be overwritten by the AI-generated metadata.
+        """
+        instance = serializer.save()
+        try:
+            if instance.src:
+                # 🔹 Generate AI caption
+                ai_title, ai_body = self.generate_ai_metadata(instance.src.path)
+
+                # Overwrite existing metadata
+                instance.title = ai_title
+                instance.body = ai_body
+                instance.slug = self.slugify_title(ai_title)
+                instance.save()
+
+        except Exception as e:
+            print(f"⚠️ AI metadata generation failed: {e}")
+
+    def generate_ai_metadata(self, image_path: str):
+        """Generate AI title and poetic body based on image"""
+        prompt = """
+        Analyze this image and write:
+        1. A short, elegant title (3–6 words)
+        2. A poetic description (1–2 sentences)
+        Return output in the format:
+        Title: ...
+        Body: ...
+        """
+        model = genai.GenerativeModel("gemini-2.0-flash")
+
+        with open(image_path, "rb") as f:
+            image_data = {"mime_type": "image/jpeg", "data": f.read()}
+
+        response = model.generate_content([prompt, image_data])
+        text = response.text.strip()
+
+        # 🔹 Extract structured text
+        import re
+
+        title_match = re.search(r"Title:\s*(.*)", text)
+        body_match = re.search(r"Body:\s*(.*)", text)
+        title = title_match.group(1).strip() if title_match else "Untitled Moment"
+        body = (
+            body_match.group(1).strip()
+            if body_match
+            else "Captured through an unseen lens of wonder."
+        )
+        return title, body
+
+    def slugify_title(self, title):
+        from django.utils.text import slugify
+
+        return slugify(title)
 
 
 class MoodViewSet(viewsets.ModelViewSet):

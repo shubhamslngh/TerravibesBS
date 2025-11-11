@@ -19,7 +19,7 @@ class GuideSerializer(serializers.ModelSerializer):
 class MoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mood
-        fields = ["id", "name", "description", "icon"]
+        fields = ["id", "name", "description", "icon", "image"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
