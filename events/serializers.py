@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from .models import Vendor, Content, EventPackage, Inquiry, Booking, Guide
+from .models import Vendor, Content, EventPackage, Inquiry, Booking, Guide, Mood
 from rest_framework.authtoken.models import Token
 
 
@@ -14,6 +14,12 @@ class GuideSerializer(serializers.ModelSerializer):
     class Meta:
         model = Guide
         fields = ["id", "name", "bio", "photo", "expertise", "packages"]
+
+
+class MoodSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mood
+        fields = ["id", "name", "description", "icon"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -87,6 +93,30 @@ class ContentSerializer(serializers.ModelSerializer):
 class EventPackageSerializer(serializers.ModelSerializer):
     images = ContentSerializer(many=True, read_only=True)
     guides = GuideSerializer(many=True, read_only=True)
+    moods = MoodSerializer(many=True, read_only=True)
+
+    # Writable through IDs
+    image_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Content.objects.all(),
+        write_only=True,
+        required=False,
+        source="images",
+    )
+    guide_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Guide.objects.all(),
+        write_only=True,
+        required=False,
+        source="guides",
+    )
+    mood_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Mood.objects.all(),
+        write_only=True,
+        required=False,
+        source="moods",
+    )
 
     class Meta:
         model = EventPackage
@@ -96,11 +126,35 @@ class EventPackageSerializer(serializers.ModelSerializer):
             "description",
             "price",
             "services",
-            "images",
             "is_active",
             "moods",
+            "images",
             "guides",
+            "image_ids",
+            "guide_ids",
+            "mood_ids",  # ✅ include this
         ]
+
+    def update(self, instance, validated_data):
+        # Extract related sets
+        images = validated_data.pop("images", None)
+        guides = validated_data.pop("guides", None)
+        moods = validated_data.pop("moods", None)
+
+        # Normal field updates
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        # Related model updates
+        if images is not None:
+            instance.images.set(images)
+        if guides is not None:
+            instance.guides.set(guides)
+        if moods is not None:
+            instance.moods.set(moods)
+
+        instance.save()
+        return instance
 
 
 class InquirySerializer(serializers.ModelSerializer):

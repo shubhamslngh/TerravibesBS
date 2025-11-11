@@ -40,10 +40,10 @@ class Content(models.Model):
         ("gallery", "Gallery Image"),
     ]
     title = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255,  blank=True, unique=True) 
+    slug = models.SlugField(max_length=255,  blank=True, default="") 
     content_type = models.CharField(max_length=50, choices=CONTENT_TYPES)
     body = models.TextField(blank=True)
-    media_file = models.FileField(upload_to="uploads/")
+    src = models.FileField(upload_to="uploads/")
     publish_date = models.DateTimeField(default=timezone.now)
 
     def save(self, *args, **kwargs):
@@ -92,6 +92,15 @@ class HealingActivity(models.Model):
         return self.title
 
 
+class Mood(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    icon = models.CharField(max_length=50, blank=True)  # optional, e.g. 🎭
+
+    def __str__(self):
+        return self.name
+
+
 class EventPackage(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -99,7 +108,7 @@ class EventPackage(models.Model):
     services = models.JSONField(help_text="List of included services and details")
     images = models.ManyToManyField(Content, blank=True)
     is_active = models.BooleanField(default=True)
-    moods = models.ManyToManyField(Mood, related_name='event_packages')
+    moods = models.ManyToManyField(Mood, blank=True)
     healing_intents = models.ManyToManyField(HealingIntent, related_name='event_packages')
 
     def __str__(self):

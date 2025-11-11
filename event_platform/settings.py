@@ -43,14 +43,15 @@ ALLOWED_HOSTS = [
     "localhost",
     "onrender.com",
     "event-platform-ai9e.onrender.com",
-    "https://terra-vibes-fs-6f8t-git-master-shubhamslnghs-projects.vercel.app/",
+    "https://terra-vibes-fs-6f8t-git-master-shubhamslnghs-projects.vercel.app",
 ]
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://event-platform-ai9e.onrender.com",
-    "https://terra-vibes-fs-6f8t-git-master-shubhamslnghs-projects.vercel.app/",
+    "https://terra-vibes-fs-6f8t-git-master-shubhamslnghs-projects.vercel.app",
 ]
+GEMINI_API_KEY = "AIzaSyCGz6vu2mGI_l43MGwMDPKT1LG-h7e6mFs"
 
 
 CORS_ALLOW_ALL_ORIGINS = True
