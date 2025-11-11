@@ -17,7 +17,7 @@ from .serializers import (
     LoginSerializer,
     MoodSerializer
 )
-from events.models import Guide
+from events.models import Mood,Guide
 from events.serializers import GuideSerializer
 from django.conf import settings
 import google.generativeai as genai
@@ -28,6 +28,7 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import EventPackage
 from .serializers import EventPackageSerializer
 import json
+
 
 
 @api_view(["POST"])
@@ -194,25 +195,7 @@ class BookingViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
 
-import os, json, re
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status, permissions
-import google.generativeai as genai
-from .models import EventPackage
-from .serializers import EventPackageSerializer
-from events.models import Mood, Guide  # assuming you have these models
-
 genai.configure(api_key=settings.GEMINI_API_KEY)
-
-import os, json, re
-from django.conf import settings
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework import status, permissions
-import google.generativeai as genai
-from events.models import Mood, Guide  # assuming they exist
 
 
 @api_view(["POST"])

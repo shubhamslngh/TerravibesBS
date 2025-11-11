@@ -61,13 +61,6 @@ class Content(models.Model):
         return f"{self.title} ({self.content_type})"
 
 
-class Mood(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True)
-    color_palette = models.JSONField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class HealingIntent(models.Model):
@@ -96,7 +89,7 @@ class Mood(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     icon = models.CharField(max_length=50, blank=True)  # optional, e.g. 🎭
-
+    image = models.ImageField(upload_to="moods/", blank=True, null=True)
     def __str__(self):
         return self.name
 
